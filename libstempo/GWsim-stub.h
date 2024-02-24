@@ -31,6 +31,8 @@ typedef struct gwSrc {
 
 void setupGW(gwSrc *gw);
 void GWbackground(gwSrc *gw,int numberGW,long *idum,long double flo,long double fhi,double gwAmp,double alpha,int loglin);
+void GWbackground_write(gwSrc *gw, FILE *file,int ngw, int ireal);  /* Added to write the GWB injections*/
+int GWbackground_read(gwSrc *gw, FILE *file, int ireal); /*Added to read the GWB injection*/
 long double calculateResidualGW(long double *kp,gwSrc *gw,long double time,long double dist);
 void setupPulsar_GWsim(long double ra_p,long double dec_p,long double *kp);
 

@@ -32,6 +32,9 @@ except ImportError:
 from libc cimport stdlib, stdio
 from libc.string cimport strncpy, memset
 
+from libc.stdio cimport FILE  
+
+
 from cython cimport view
 
 import numpy
@@ -102,6 +105,8 @@ cdef extern from "GWsim-stub.h":
         long double phi_polar_g
 
     void GWbackground(gwSrc *gw,int numberGW,long *idum,long double flo,long double fhi,double gwAmp,double alpha,int loglin)
+    void GWbackground_write(gwSrc *gw,FILE *fp,int ngw,int ireal)
+    int GWbackground_read(gwSrc *gw, FILE *file, int ireal)
     void GWdipolebackground(gwSrc *gw,int numberGW,long *idum,long double flo,long double fhi, double gwAmp,double alpha,int loglin, double *dipoleamps)
     void setupGW(gwSrc *gw)
     void setupPulsar_GWsim(long double ra_p,long double dec_p,long double *kp)
@@ -513,9 +518,10 @@ cdef create_tempojump(pulsar *psr,int ct,object units):
 cdef class GWB:
     cdef gwSrc *gw
     cdef int ngw
+    cdef FILE *fp
 
     def __cinit__(self,ngw=1000,seed=None,flow=1e-8,fhigh=1e-5,gwAmp=1e-20,alpha=-0.66,logspacing=True, \
-                  dipoleamps=None,dipoledir=None,dipolemag=None):
+                  dipoleamps=None,dipoledir=None,dipolemag=None,file_path=None):
         self.gw = <gwSrc *>stdlib.malloc(sizeof(gwSrc)*ngw)
         self.ngw = ngw
 
@@ -553,7 +559,10 @@ cdef class GWB:
             GWdipolebackground(self.gw,ngw,&idum,flow,fhigh,gwAmp,alpha,1 if logspacing else 0, &dipamps[0])
         else:
             GWbackground(self.gw,ngw,&idum,flow,fhigh,gwAmp,alpha,1 if logspacing else 0)
-
+            if file_path is not None:
+                fp = <FILE *>stdio.fopen(file_path,"wb")
+                GWbackground_write(self.gw,fp,ngw,1)
+                stdio.fclose(fp)
         for i in range(ngw):
           setupGW(&self.gw[i])
 

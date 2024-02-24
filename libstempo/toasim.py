@@ -23,7 +23,7 @@ year = 365.25 * day
 DMk = 4.15e3  # Units MHz^2 cm^3 pc sec
 
 
-def add_gwb(psr, dist=1, ngw=1000, seed=None, flow=1e-8, fhigh=1e-5, gwAmp=1e-20, alpha=-0.66, logspacing=True):
+def add_gwb(psr, dist=1, ngw=1000, seed=None, flow=1e-8, fhigh=1e-5, gwAmp=1e-20, alpha=-0.66, logspacing=True,file_path=None):
     """Add a stochastic background from inspiraling binaries, using the tempo2
     code that underlies the GWbkgrd plugin.
 
@@ -43,7 +43,7 @@ def add_gwb(psr, dist=1, ngw=1000, seed=None, flow=1e-8, fhigh=1e-5, gwAmp=1e-20
     Returns the GWB object
     """
 
-    gwb = GWB(ngw, seed, flow, fhigh, gwAmp, alpha, logspacing)
+    gwb = GWB(ngw, seed, flow, fhigh, gwAmp, alpha, logspacing,file_path=file_path)  ### Lat argument added by Atharva to write GWB.
     gwb.add_gwb(psr, dist)
 
     return gwb
